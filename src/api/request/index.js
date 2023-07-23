@@ -12,7 +12,6 @@ requestRes.interceptors.request.use(async (config) => {
 
 requestRes.interceptors.response.use((response) => {
   const { data } = response;
-  console.log(response, "--response");
 
   return data;
 });

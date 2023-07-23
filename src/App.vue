@@ -5,13 +5,13 @@
 </template>
 
 <script>
-// import { weatherInfo } from "@/api/interface/api";
+// import { statisticsHour } from "@/api/interface/api";
 export default {
   data() {
     return {};
   },
   // async mounted() {
-  //   const res = await weatherInfo({ a: 1 });
+  //   const res = await statisticsHour({ a: 1 });
   //   console.log(res, "----rse");
   // },
   methods: {},

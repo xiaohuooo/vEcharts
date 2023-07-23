@@ -5,22 +5,30 @@
         <charts height="14%" title="环境实况">
           <ul class="reality">
             <li>
-              <span><img src="@/assets/weather/wendu.png" alt="" />温度</span>
+              <span
+                ><img src="@/assets/weather/v1/qiwen.png" alt="" />气温</span
+              >
               <br />
               <span class="re-num">{{ realtimeData[2]?.data }}<i>℃</i></span>
             </li>
             <li>
-              <span><img src="@/assets/weather/fengli.png" alt="" />风力</span>
+              <span
+                ><img src="@/assets/weather/v1/fengli.png" alt="" />风力</span
+              >
               <br />
               <span class="re-num">{{ realtimeData[0]?.data }}<i>m/s</i> </span>
             </li>
             <li>
-              <span><img src="@/assets/weather/yuliang.png" alt="" />雨量</span>
+              <span
+                ><img src="@/assets/weather/v1/yuliang.png" alt="" />雨量</span
+              >
               <br />
               <span class="re-num">{{ realtimeData[3]?.data }}<i>mm</i></span>
             </li>
             <li>
-              <span><img src="@/assets/weather/shuiwei.png" alt="" />水位</span>
+              <span
+                ><img src="@/assets/weather/v1/shuiwei.png" alt="" />水位</span
+              >
 
               <br />
               <span class="re-num">{{ realtimeData[4]?.data }}<i>m</i></span>
@@ -84,6 +92,12 @@
 </template>
 
 <script>
+import {
+  weatherInfo,
+  statisticsHour,
+  environmentReality,
+  weatherStatistics,
+} from "@/api/interface/api";
 import charts from "@/components/charts";
 import moment from "moment";
 const weatherDatal = {
@@ -228,7 +242,7 @@ export default {
                 qing: {
                   backgroundColor: {
                     // image: require('@/assets/weather/' + this.weatherdata + '.png')
-                    image: require("@/assets/weather/qing.png"),
+                    image: require("@/assets/weather/v1/qing.png"),
                   },
                   height: 40,
                   width: 40,
@@ -236,7 +250,7 @@ export default {
                 duoyun: {
                   backgroundColor: {
                     // image: require('@/assets/weather/' + this.weatherdata[1] + '.png')
-                    image: require("@/assets/weather/duoyun.png"),
+                    image: require("@/assets/weather/v1/duoyun.png"),
                   },
                   height: 40,
                   width: 40,
@@ -244,7 +258,7 @@ export default {
                 yu: {
                   backgroundColor: {
                     // image: require('@/assets/weather/' + this.weatherdata[2] + '.png')
-                    image: require("@/assets/weather/yu.png"),
+                    image: require("@/assets/weather/v1/yu.png"),
                   },
                   height: 40,
                   width: 40,
@@ -310,7 +324,7 @@ export default {
             type: "category",
             boundaryGap: false,
             position: "top",
-            offset: -150,
+            offset: -120,
             axisLine: {
               show: false,
               lineStyle: {
@@ -385,9 +399,7 @@ export default {
             showSymbol: true,
             smooth: true,
             itemStyle: {
-              normal: {
-                color: "#FFD43A",
-              },
+              color: "#FFD43A",
             },
             label: {
               show: true,
@@ -413,9 +425,7 @@ export default {
             showSymbol: true,
             smooth: true,
             itemStyle: {
-              normal: {
-                color: "#2596FF",
-              },
+              color: "#2596FF",
             },
             label: {
               show: true,
@@ -613,7 +623,8 @@ export default {
     clearInterval(this.timer1);
   },
   methods: {
-    weatherInfo(params) {
+    async weatherInfo(params) {
+      const res = await weatherInfo(params);
       const chineseDays = [
         "周一",
         "周二",
@@ -623,65 +634,7 @@ export default {
         "周六",
         "周天",
       ];
-      const casts = [
-        {
-          date: "2023-07-15",
-          week: "6",
-          dayweather: "多云",
-          nightweather: "阵雨",
-          daytemp: "35",
-          nighttemp: "27",
-          daywind: "北",
-          nightwind: "北",
-          daypower: "≤3",
-          nightpower: "≤3",
-          daytemp_float: "35.0",
-          nighttemp_float: "27.0",
-        },
-        {
-          date: "2023-07-16",
-          week: "7",
-          dayweather: "阵雨",
-          nightweather: "多云",
-          daytemp: "35",
-          nighttemp: "27",
-          daywind: "北",
-          nightwind: "北",
-          daypower: "≤3",
-          nightpower: "≤3",
-          daytemp_float: "35.0",
-          nighttemp_float: "27.0",
-        },
-        {
-          date: "2023-07-17",
-          week: "1",
-          dayweather: "阵雨",
-          nightweather: "中雨",
-          daytemp: "34",
-          nighttemp: "26",
-          daywind: "北",
-          nightwind: "北",
-          daypower: "5",
-          nightpower: "5",
-          daytemp_float: "34.0",
-          nighttemp_float: "26.0",
-        },
-        {
-          date: "2023-07-18",
-          week: "2",
-          dayweather: "大雨",
-          nightweather: "阵雨",
-          daytemp: "31",
-          nighttemp: "25",
-          daywind: "东北",
-          nightwind: "东北",
-          daypower: "4",
-          nightpower: "4",
-          daytemp_float: "31.0",
-          nighttemp_float: "25.0",
-        },
-      ];
-      console.log(casts, "--casts");
+      const { casts } = res.data.forecasts[0];
       const date = casts.map((cast) => moment(cast.date).format("MM/DD"));
       const week = casts.map((cast) => chineseDays[cast.week - 1]);
       const dayweather = casts.map((cast) => cast.dayweather);
@@ -707,142 +660,153 @@ export default {
       this.webOption.series[1].data = nighttemp_float;
     },
     statisticsHour(params) {
-      const list = {
-        dateTime: [
-          "10:00",
-          "11:00",
-          "12:00",
-          "13:00",
-          "14:00",
-          "16:00",
-          "17:00",
-        ],
-        seriesData: [
-          [32.1, 33, 33.9, 34.5, 35, 35.6, 35.6],
-          [0.9, 0.9, 0.7, 1, 1.4, 1.2, 0.9],
-          [0, 1, 0, 5, 0, 6, 0],
-          [31.003, 31.007, 31.015, 31.008, 31.004, 31.004, 31.003],
-          [30.6, 30.8, 31.1, 31.3, 31.6, 32.3, 32.5],
-        ],
-      };
-      this.option = [];
-      for (let i = 0; i < 4; i++) {
-        if (i % 2 == 0) {
-          this.option.push({
-            tooltip: {
-              trigger: "axis",
-            },
-            grid: {
-              top: "10",
-              bottom: "40",
-            },
-            xAxis: {
-              type: "category",
-              boundaryGap: false,
-              data: list.dateTime,
-              axisLine: {
-                lineStyle: {
-                  color: "white",
-                },
+      statisticsHour(params).then((res) => {
+        const list = this.processData(res.data.content);
+        this.option = [];
+        for (let i = 0; i < 4; i++) {
+          if (i % 2 == 0) {
+            this.option.push({
+              tooltip: {
+                trigger: "axis",
               },
-            },
-            yAxis: {
-              type: "value",
-              splitLine: {
-                // show: false,
-                lineStyle: {
-                  type: "dashed",
-                  color: "#A9B1BC",
-                  opacity: 0.2,
-                },
+              grid: {
+                top: "10",
+                bottom: "40",
               },
-              axisLine: {
-                lineStyle: {
-                  color: "white",
-                },
-              },
-            },
-            series: [
-              {
-                data: list.seriesData[i],
-                type: "line",
-                symbol: "none",
-                smooth: true,
-                lineStyle: {
-                  color: "#25FFE5",
-                },
-                areaStyle: {
-                  //   opacity: 0.3,
-                  color: {
-                    type: "linear",
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [
-                      {
-                        offset: 0,
-                        color: "#25FFE5", // 起始颜色
-                      },
-                      {
-                        offset: 1,
-                        color: "rgba(37,255,229,0)", // 结束颜色
-                      },
-                    ],
+              xAxis: {
+                type: "category",
+                boundaryGap: false,
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
                   },
                 },
               },
-            ],
-          });
-        } else {
-          this.option.push({
-            tooltip: {
-              trigger: "axis",
-            },
-            grid: {
-              top: "10",
-              bottom: "40",
-            },
-            xAxis: {
-              type: "category",
-              data: list.dateTime,
-              axisLine: {
-                lineStyle: {
-                  color: "white",
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  // show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
                 },
               },
-            },
-            yAxis: {
-              type: "value",
-              splitLine: {
-                lineStyle: {
-                  type: "dashed",
-                  color: "#A9B1BC",
-                  opacity: 0.2,
+              series: [
+                {
+                  data: list.seriesData[i],
+                  type: "line",
+                  symbol: "none",
+                  smooth: true,
+                  lineStyle: {
+                    color: "#25FFE5",
+                  },
+                  areaStyle: {
+                    //   opacity: 0.3,
+                    color: {
+                      type: "linear",
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [
+                        {
+                          offset: 0,
+                          color: "#25FFE5", // 起始颜色
+                        },
+                        {
+                          offset: 1,
+                          color: "rgba(37,255,229,0)", // 结束颜色
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            });
+          } else {
+            this.option.push({
+              tooltip: {
+                trigger: "axis",
+              },
+              grid: {
+                top: "10",
+                bottom: "40",
+              },
+              xAxis: {
+                type: "category",
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
                 },
               },
-              axisLine: {
-                lineStyle: {
-                  color: "white",
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
                 },
               },
-            },
-            series: [
-              {
-                data: list.seriesData[i],
-                type: "bar",
-                showBackground: true,
-                barWidth: 15,
-                backgroundStyle: {
-                  color: "#0A2747",
-                  opacity: 0.7,
+              series: [
+                {
+                  data: list.seriesData[i],
+                  type: "bar",
+                  showBackground: true,
+                  barWidth: 15,
+                  backgroundStyle: {
+                    color: "#0A2747",
+                    opacity: 0.7,
+                  },
+                  color: "#25FFE5",
                 },
-                color: "#25FFE5",
-              },
-            ],
-          });
+              ],
+            });
+          }
         }
-      }
+      });
+    },
+    processData(data) {
+      const res = {
+        dateTime: [],
+        seriesData: [[], [], [], [], []],
+      };
+
+      const sensorNameMap = new Map([
+        ["温度", 0],
+        ["风速", 1],
+        ["雨量", 2],
+        ["水位", 3],
+        ["水温", 4],
+      ]);
+
+      data.forEach((item) => {
+        res.dateTime.push(moment(item.dateTime).format("HH:mm"));
+        item.list.forEach((sensor) => {
+          const index = sensorNameMap.get(sensor.name);
+          if (index !== undefined) {
+            res.seriesData[index].push(sensor.data);
+          }
+        });
+      });
+
+      return res;
     },
     weatherStatistics(params) {
       let TeamNum = [];
@@ -854,110 +818,60 @@ export default {
         ["重度污染"],
         ["严重污染"],
       ];
-      const {
-        highTempNum,
-        lowTempNum,
-        normalTempNum,
-        pm10L1,
-        pm10L2,
-        pm10L3,
-        pm10L4,
-        pm10L5,
-        pm10L6,
-        pm25L1,
-        pm25L2,
-        pm25L3,
-        pm25L4,
-        pm25L5,
-        pm25L6,
-      } = {
-        pm25L1: 4,
-        pm25L2: 0,
-        pm25L3: 0,
-        pm25L4: 0,
-        pm25L5: 0,
-        pm25L6: 0,
-        pm10L1: 4,
-        pm10L2: 0,
-        pm10L3: 0,
-        pm10L4: 0,
-        pm10L5: 0,
-        pm10L6: 0,
-        highTempNum: 4,
-        normalTempNum: 0,
-        lowTempNum: 0,
-      };
-      TeamNum.push(
-        {
-          value: highTempNum,
-          name: "高温30°C以上",
-          itemStyle: { color: "#25ffe5" },
-        },
-        {
-          value: lowTempNum,
-          name: "常温度15°C-30°C",
-          itemStyle: { color: "#FF6E9A" },
-        },
-        {
-          value: normalTempNum,
-          name: "低温15°C以下",
-          itemStyle: { color: "#2596FF" },
-        }
-      );
-      pmSource[0].push(pm10L1, pm25L1);
-      pmSource[1].push(pm10L2, pm25L2);
-      pmSource[2].push(pm10L3, pm25L3);
-      pmSource[3].push(pm10L4, pm25L4);
-      pmSource[4].push(pm10L5, pm25L5);
-      pmSource[5].push(pm10L6, pm25L6);
+      weatherStatistics(params).then((res) => {
+        const {
+          highTempNum,
+          lowTempNum,
+          normalTempNum,
+          pm10L1,
+          pm10L2,
+          pm10L3,
+          pm10L4,
+          pm10L5,
+          pm10L6,
+          pm25L1,
+          pm25L2,
+          pm25L3,
+          pm25L4,
+          pm25L5,
+          pm25L6,
+        } = res.data.result;
+        TeamNum.push(
+          {
+            value: highTempNum,
+            name: "高温30°C以上",
+            itemStyle: { color: "#25ffe5" },
+          },
+          {
+            value: lowTempNum,
+            name: "常温度15°C-30°C",
+            itemStyle: { color: "#FF6E9A" },
+          },
+          {
+            value: normalTempNum,
+            name: "低温15°C以下",
+            itemStyle: { color: "#2596FF" },
+          }
+        );
+        pmSource[0].push(pm10L1, pm25L1);
+        pmSource[1].push(pm10L2, pm25L2);
+        pmSource[2].push(pm10L3, pm25L3);
+        pmSource[3].push(pm10L4, pm25L4);
+        pmSource[4].push(pm10L5, pm25L5);
+        pmSource[5].push(pm10L6, pm25L6);
+      });
 
       this.statisticsOption.dataset.source = pmSource;
       this.statisticsOption.series[0].data = TeamNum;
     },
     //环境实况
     environmentReality() {
-      this.realtimeData = [
-        {
-          sensor: "a01007",
-          data: Math.floor(Math.random() * (10 - 1 + 1)) + 1,
-          flag: "N",
-          name: "风速",
-        },
-        {
-          sensor: "f01001",
-          data: Math.floor(Math.random() * (10 - 1 + 1)) + 1,
-          flag: "N",
-          name: "风力",
-        },
-        {
-          sensor: "a01001",
-          data: 35.7,
-          flag: "N",
-          name: "温度",
-        },
-        {
-          sensor: "c01015",
-          data: 0,
-          flag: "N",
-          name: "雨量",
-        },
-        {
-          sensor: "as2104",
-          data: 31.008,
-          flag: "N",
-          name: "水位",
-        },
-        {
-          sensor: "w01010",
-          data: 32.6,
-          flag: "N",
-          name: "水温",
-        },
-      ];
+      environmentReality().then((res) => {
+        this.realtimeData = res.data.realtimeData;
+      });
     },
     onChange(date, dateString) {
       this.dateRange = date;
-      console.log(date, dateString);
     },
     onOk(value) {
       this.weatherStatistics({
@@ -966,7 +880,6 @@ export default {
       });
     },
     ondropdownClick({ key }) {
-      console.log(key);
       this.dropdown = key;
       this.dateRange = this.presetRanges[key];
       this.weatherStatistics({

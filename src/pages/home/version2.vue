@@ -1,39 +1,69 @@
 <template>
   <div class="environmental">
     <transition name="cc" v-if="!isToggled">
-      <div class="left aside" style="left: 20px">
-        <charts height="12%" title="环境实况">
+      <div class="left aside" style="left: 50px">
+        <charts height="14%" title="环境实况">
           <ul class="reality">
             <li>
-              <img src="@/assets/weather/wendu.png" alt="" />
-              <span class="re-num">{{ realtimeData[2]?.data }}<i>℃</i></span>
-              <br />
-              <span>温度</span>
+              <img src="@/assets/weather/qiwen.png" alt="" />
+              <div style="display: inline-block">
+                <span class="re-num">
+                  <span class="elliptical">{{
+                    realtimeData && realtimeData[2]?.data.toFixed(1)
+                  }}</span>
+                  <i>℃</i>
+                </span>
+                <br />
+                <span>气温</span>
+              </div>
             </li>
             <li>
               <img src="@/assets/weather/fengli.png" alt="" />
-              <span class="re-num">{{ realtimeData[0]?.data }}<i>m/s</i> </span>
-              <br />
-              <span>风力</span>
+              <div style="display: inline-block">
+                <span class="re-num">
+                  <span class="elliptical">{{
+                    realtimeData && realtimeData[1]?.data.toFixed(1)
+                  }}</span>
+                  <i>m/s</i>
+                </span>
+                <br />
+                <span>风力</span>
+              </div>
             </li>
             <li>
               <img src="@/assets/weather/yuliang.png" alt="" />
-              <span class="re-num">{{ realtimeData[3]?.data }}<i>mm</i></span>
-              <br />
-              <span>雨量</span>
+              <div style="display: inline-block">
+                <span class="re-num">
+                  <span class="elliptical">{{
+                    realtimeData && realtimeData[3]?.data.toFixed(1)
+                  }}</span>
+
+                  <i>mm</i></span
+                >
+                <br />
+                <span>雨量</span>
+              </div>
             </li>
             <li>
               <img src="@/assets/weather/shuiwei.png" alt="" />
-              <span class="re-num">{{ realtimeData[4]?.data }}<i>m</i></span>
-              <br />
-              <span>水位</span>
+              <div style="display: inline-block">
+                <span class="re-num">
+                  <span class="elliptical">{{
+                    realtimeData && realtimeData[4]?.data.toFixed(1)
+                  }}</span>
+                  <i>m</i></span
+                >
+                <br />
+                <span>水位</span>
+              </div>
             </li>
           </ul>
         </charts>
-        <charts :option="option[0]" height="22%" title="当前气温"></charts>
-        <charts :option="option[1]" height="22%" title="当前风力"></charts>
-        <charts :option="option[2]" height="22%" title="当前雨量"></charts>
-        <charts :option="option[3]" height="22%" title="当前水位"></charts>
+        <charts :option="option[0]" height="21%" title="当前气温"></charts>
+        <charts :option="option[1]" height="21%" title="当前风力"></charts>
+        <charts :option="option[2]" height="21%" title="当前雨量"></charts>
+        <charts :option="option[3]" height="21%" title="当前水位"></charts>
+        <div class="history" @click="showModal"></div>
       </div>
     </transition>
     <span
@@ -43,7 +73,7 @@
     ></span>
 
     <transition name="cc1" v-if="!isToggled">
-      <div class="right aside" style="right: 20px">
+      <div class="right aside" style="right: 50px">
         <charts :option="webOption" height="50%" :special="1" title="天气统计">
           <div class="statistics">
             <div style="text-align: left; margin-bottom: 5px">
@@ -89,7 +119,7 @@
               @change="onChange"
               @ok="onOk"
               show-time
-              style="background: #2a497b; width: 355px"
+              style="width: 360px"
             >
               <img slot="suffixIcon" src="@/assets/weather/Frame.png" alt="" />
             </a-range-picker>
@@ -97,6 +127,45 @@
         </charts>
       </div>
     </transition>
+    <a-modal
+      v-model="visible"
+      title="历史数据"
+      @ok="handleOk"
+      centered
+      :footer="null"
+      :width="788"
+    >
+      <div class="modal-content">
+        <charts
+          :option="historyOption[0]"
+          width="49%"
+          height="180px"
+          title="气温"
+        ></charts>
+        <charts
+          :option="historyOption[1]"
+          width="49%"
+          height="180px"
+          title="风力"
+        ></charts>
+        <charts
+          :option="historyOption[2]"
+          width="49%"
+          height="180px"
+          title="雨量"
+        ></charts>
+        <charts
+          :option="historyOption[3]"
+          width="49%"
+          height="180px"
+          title="水位"
+        ></charts>
+      </div>
+
+      <template slot="closeIcon">
+        <img src="@/assets/weather/close.png" alt="" />
+      </template>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -104,6 +173,7 @@ import charts from "@/components/charts/";
 import {
   weatherInfo,
   statisticsHour,
+  statisticsDay,
   weatherStatistics,
   environmentReality,
 } from "@/api/interface/api";
@@ -129,7 +199,7 @@ const weatherDatal = {
   暴雪: "xue",
   雾: "wu",
   冻雨: "yu",
-  小到中雨: "yu",
+  "小雨-中雨": "yu",
   "中雨-大雨": "yu",
   "大雨-暴雨": "yu",
   "暴雨-大暴雨": "yu",
@@ -147,6 +217,7 @@ export default {
   data() {
     return {
       option: [],
+      historyOption: [],
       webOption: {
         grid: {
           // show: true,
@@ -359,34 +430,34 @@ export default {
             data: [],
           },
           //优良
-          // {
-          //   type: "category",
-          //   boundaryGap: false,
-          //   position: "bottom",
-          //   offset: -10,
-          //   axisLine: {
-          //     show: false,
-          //   },
-          //   axisTick: {
-          //     show: false,
-          //   },
-          //   axisLabel: {
-          //     interval: 0,
-          //     formatter: ["{a|{value}}"].join("\n"),
-          //     rich: {
-          //       a: {
-          //         fontSize: 14,
-          //         color: "white",
-          //         backgroundColor: "#34976e",
-          //         padding: [4, 15],
-          //         borderRadius: 10,
-          //       },
-          //     },
-          //   },
-          //   nameTextStyle: {},
-          //   // data: this.weatherdata.weather
-          //   data: ["优", "优", "优", "优"],
-          // },
+          {
+            type: "category",
+            boundaryGap: false,
+            position: "bottom",
+            offset: -50,
+            axisLine: {
+              show: false,
+            },
+            axisTick: {
+              show: false,
+            },
+            axisLabel: {
+              interval: 0,
+              formatter: ["{a|{value}}"].join("\n"),
+              rich: {
+                a: {
+                  fontSize: 14,
+                  color: "white",
+                  backgroundColor: "#34976e",
+                  padding: [4, 15],
+                  borderRadius: 10,
+                },
+              },
+            },
+            nameTextStyle: {},
+            // data: this.weatherdata.weather
+            data: ["优", "优", "优", "优"],
+          },
         ],
         yAxis: {
           type: "value",
@@ -499,22 +570,6 @@ export default {
             // ... 饼图的 legend 配置
           },
         ],
-
-        // graphic: [
-        //   {
-        //     type: "text",
-        //     left: "16%",
-        //     top: "15%",
-        //     style: {
-        //       fill: "white",
-        //       text: "",
-        //       fontWeight: "bold",
-        //       fontSize: "24px",
-        //       // textAlign: "center",
-        //       // textVerticalAlign: "middle",
-        //     },
-        //   },
-        // ],
         dataset: {
           source: [],
         },
@@ -546,9 +601,8 @@ export default {
           {
             name: "温度统计",
             type: "pie",
-            // radius: "30%",
             radius: ["24%", "30%"],
-            selectedMode: "single",
+            // selectedMode: "single",
             center: ["20%", "20%"],
             label: {
               position: "center",
@@ -654,7 +708,6 @@ export default {
               },
             },
           },
-
           {
             name: "PM2.5",
             type: "line",
@@ -717,49 +770,13 @@ export default {
       timer: "",
       timer1: "",
       isToggled: false,
-      realtimeData: [
-        {
-          sensor: "a01007",
-          data: Math.floor(Math.random() * (10 - 1 + 1)) + 1,
-          flag: "N",
-          name: "风速",
-        },
-        {
-          sensor: "f01001",
-          data: Math.floor(Math.random() * (10 - 1 + 1)) + 1,
-          flag: "N",
-          name: "风力",
-        },
-        {
-          sensor: "a01001",
-          data: 35.7,
-          flag: "N",
-          name: "温度",
-        },
-        {
-          sensor: "c01015",
-          data: 0,
-          flag: "N",
-          name: "雨量",
-        },
-        {
-          sensor: "as2104",
-          data: 31.008,
-          flag: "N",
-          name: "水位",
-        },
-        {
-          sensor: "w01010",
-          data: 32.6,
-          flag: "N",
-          name: "水温",
-        },
-      ], //环境实况数据
+      realtimeData: [], //环境实况数据
+      visible: false,
     };
   },
   created() {
     //环境实况
-    // this.environmentReality();
+    this.environmentReality();
   },
   mounted() {
     this.weatherInfo({
@@ -782,9 +799,9 @@ export default {
         endTime: moment(currentTime).format("YYYY-MM-DD HH:mm:ss"),
       });
     }, 1000 * 60 * 30);
-    // this.timer1 = setInterval(() => {
-    //   this.environmentReality();
-    // }, 1000 * 60);
+    this.timer1 = setInterval(() => {
+      this.environmentReality();
+    }, 1000 * 60);
     this.ondropdownClick({ key: "本月" });
   },
   beforeDestroy() {
@@ -792,6 +809,7 @@ export default {
     clearInterval(this.timer1);
   },
   methods: {
+    //天气统计
     async weatherInfo(params) {
       const res = await weatherInfo(params);
       const chineseDays = [
@@ -803,8 +821,7 @@ export default {
         "周六",
         "周天",
       ];
-      const { casts } = res.forecasts[0];
-      console.log(casts, "--casts");
+      const { casts } = res.data.forecasts[0];
       const date = casts.map((cast) => moment(cast.date).format("MM/DD"));
       const week = casts.map((cast) => chineseDays[cast.week - 1]);
       const dayweather = casts.map((cast) => cast.dayweather);
@@ -812,11 +829,6 @@ export default {
       const daytemp_float = casts.map((cast) => cast.daytemp_float);
       const nighttemp_float = casts.map((cast) => cast.nighttemp_float);
       const daywind = casts.map((cast) => cast.daywind + "风");
-      console.log(
-        { date, week, dayweather, daytemp_float, nighttemp_float, daywind },
-        "--casts"
-      );
-
       // this.weatherdata = dayweather;
       // console.log(dayweather, "--dayweather");
       this.webOption.xAxis.forEach((xAxis, index) => {
@@ -833,272 +845,19 @@ export default {
       this.webOption.series[0].data = daytemp_float;
       this.webOption.series[1].data = nighttemp_float;
     },
+    //环境按小时查询
     statisticsHour(params) {
       statisticsHour(params).then((res) => {
-        if (res.code == "1001") {
-          console.log(res.content, "--res.content");
-          const list = this.processData(res.content);
-          this.option = [];
-          for (let i = 0; i < 4; i++) {
-            if (i % 2 == 0) {
-              if (i == 2) {
-                this.option.push({
-                  tooltip: {
-                    trigger: "axis",
-                  },
-                  grid: {
-                    top: "10",
-                    bottom: "40",
-                  },
-                  xAxis: {
-                    type: "category",
-                    // boundaryGap: false,
-                    data: list.dateTime,
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  yAxis: {
-                    type: "value",
-                    splitLine: {
-                      // show: false,
-                      lineStyle: {
-                        type: "dashed",
-                        color: "#A9B1BC",
-                        opacity: 0.2,
-                      },
-                    },
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  series: [
-                    {
-                      data: [13, 60, 25, 18, 12, 9, 2, 1], //list.seriesData[i],[13, 60, 25, 18, 12, 9, 2, 1]
-                      type: "pictorialBar",
-                      barCategoryGap: "-80%",
-                      // symbol: "none",
-                      // smooth: true,
-                      symbol:
-                        "path://M0,10 L10,10 C5.5,10 5.5,5 5,0 C4.5,5 4.5,10 0,10 z",
-                      itemStyle: {
-                        color: "#42C7FF",
-                      },
-                    },
-                  ],
-                });
-              } else {
-                this.option.push({
-                  tooltip: {
-                    trigger: "axis",
-                  },
-                  grid: {
-                    top: "10",
-                    bottom: "40",
-                  },
-                  xAxis: {
-                    type: "category",
-                    // boundaryGap: false,
-                    data: list.dateTime,
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  yAxis: {
-                    type: "value",
-                    splitLine: {
-                      // show: false,
-                      lineStyle: {
-                        type: "dashed",
-                        color: "#A9B1BC",
-                        opacity: 0.2,
-                      },
-                    },
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  series: [
-                    {
-                      data: list.seriesData[i],
-                      type: "line",
-                      // symbol: "none",
-                      // smooth: true,
-                      symbol: "circle",
-                      symbolSize: 5,
-                      itemStyle: {
-                        color: "#0783FA", // 符号的颜色
-                      },
-                      areaStyle: {
-                        //   opacity: 0.3,
-                        color: {
-                          type: "linear",
-                          x: 0,
-                          y: 0,
-                          x2: 0,
-                          y2: 1,
-                          colorStops: [
-                            {
-                              offset: 0,
-                              color: "#0085FF", // 起始颜色
-                            },
-                            {
-                              offset: 1,
-                              color: "rgba(0,133,255,0)", // 结束颜色
-                            },
-                          ],
-                        },
-                      },
-                    },
-                  ],
-                });
-              }
-            } else {
-              if (i == 1) {
-                this.option.push({
-                  tooltip: {
-                    trigger: "axis",
-                  },
-                  grid: {
-                    top: "10",
-                    bottom: "40",
-                  },
-                  xAxis: {
-                    type: "category",
-                    data: list.dateTime,
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  yAxis: {
-                    type: "value",
-                    splitLine: {
-                      lineStyle: {
-                        type: "dashed",
-                        color: "#A9B1BC",
-                        opacity: 0.2,
-                      },
-                    },
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  series: [
-                    {
-                      data: list.seriesData[i],
-                      type: "bar",
-                      barWidth: 15,
-                      color: {
-                        type: "linear",
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [
-                          {
-                            offset: 0,
-                            color: "#0085FF", // 起始颜色
-                          },
-                          {
-                            offset: 1,
-                            color: "#51E0FF", // 结束颜色
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                });
-              } else {
-                this.option.push({
-                  tooltip: {
-                    trigger: "axis",
-                  },
-                  grid: {
-                    top: "10",
-                    bottom: "40",
-                  },
-                  xAxis: {
-                    type: "category",
-                    data: list.dateTime,
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  yAxis: {
-                    type: "value",
-                    splitLine: {
-                      lineStyle: {
-                        type: "dashed",
-                        color: "#A9B1BC",
-                        opacity: 0.2,
-                      },
-                    },
-                    axisLine: {
-                      lineStyle: {
-                        color: "white",
-                      },
-                    },
-                  },
-                  series: [
-                    {
-                      data: list.seriesData[i],
-                      type: "bar",
-                      showBackground: true,
-                      barWidth: 15,
-                      backgroundStyle: {
-                        color: "#0A2747",
-                        opacity: 0.7,
-                      },
-                      color: {
-                        type: "linear",
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [
-                          {
-                            offset: 0,
-                            color: "rgba(0,85,255,0)", // 起始颜色
-                          },
-                          {
-                            offset: 1,
-                            color: "#0783FA", // 结束颜色
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      color: "#15b1ff",
-                      type: "pictorialBar",
-                      symbol: "rect",
-                      symbolSize: ["15", "4"],
-                      symbolPosition: "end", // 图形边缘与柱子结束的地方内切。
-                      symbolOffset: [0, -2], // 椭圆水平偏移,垂直偏移. 因为不一定正好盖住柱形,所以可能要移动一点点
-                      data: list.seriesData[i],
-                      z: 3, // 数值越大,层级越高,可以盖住下面的图形
-                    },
-                  ],
-                });
-              }
-            }
-          }
-        }
+        this.processData(res.data.content, true);
       });
     },
+    //环境按天数查询
+    statisticsDay(params) {
+      statisticsDay(params).then((res) => {
+        this.processData(res.data.content, false);
+      });
+    },
+    //环境统计
     weatherStatistics(params) {
       let TeamNum = [];
       let pmSource = [
@@ -1123,7 +882,7 @@ export default {
           pm25L4,
           pm25L5,
           pm25L6,
-        } = res.result;
+        } = res.data.result;
         TeamNum.push(
           {
             value: highTempNum,
@@ -1145,15 +904,13 @@ export default {
       this.statisticsOption.series[0].data = TeamNum;
     },
     //环境实况
-    // environmentReality() {
-    //   environmentReality().then((res) => {
-    //     console.log(res, "--环境实况");
-    //     this.realtimeData = res.content.realtimeData;
-    //   });
-    // },
+    environmentReality() {
+      environmentReality().then((res) => {
+        this.realtimeData = res.data.realtimeData;
+      });
+    },
     onChange(date, dateString) {
       this.dateRange = date;
-      console.log(date, dateString);
     },
     onOk(value) {
       this.weatherStatistics({
@@ -1161,8 +918,8 @@ export default {
         endTime: moment(value[1]).format("YYYY-MM-DD HH:mm:ss"),
       });
     },
-    processData(data) {
-      const res = {
+    processData(data, bool) {
+      const list = {
         dateTime: [],
         seriesData: [[], [], [], [], []],
       };
@@ -1176,16 +933,285 @@ export default {
       ]);
 
       data.forEach((item) => {
-        res.dateTime.push(moment(item.dateTime).format("HH:mm"));
+        list.dateTime.push(moment(item.dateTime).format(bool ? "HH:mm" : "DD"));
         item.list.forEach((sensor) => {
           const index = sensorNameMap.get(sensor.name);
           if (index !== undefined) {
-            res.seriesData[index].push(sensor.data);
+            list.seriesData[index].push(sensor.data);
           }
         });
       });
+      let dataColor = [
+        "#426FFF",
+        "#4297FF",
+        "#42C7FF",
+        "#42F0FF",
+        "#42F1b0",
+        "#42C1b4",
+        "#6afccb",
+      ];
+      let option = [];
+      for (let i = 0; i < 4; i++) {
+        if (i % 2 == 0) {
+          if (i == 2) {
+            option.push({
+              tooltip: {
+                trigger: "axis",
+              },
+              grid: {
+                top: "10",
+                bottom: "40",
+              },
+              xAxis: {
+                type: "category",
+                // boundaryGap: false,
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  // show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              series: [
+                {
+                  name: "雨量",
+                  data: list.seriesData[i], //[13, 60, 25, 18, 12, 9, 2, 1]
+                  type: "pictorialBar",
+                  barCategoryGap: "-50%",
+                  // symbol: "none",
+                  // smooth: true,
+                  symbol:
+                    "path://M0,10 L10,10 C5.5,10 5.5,5 5,0 C4.5,5 4.5,10 0,10 z",
 
-      return res;
+                  itemStyle: {
+                    color: function (data) {
+                      return dataColor[data.dataIndex];
+                    },
+                  },
+                },
+              ],
+            });
+          } else {
+            option.push({
+              tooltip: {
+                trigger: "axis",
+              },
+              grid: {
+                top: "10",
+                bottom: "40",
+              },
+              xAxis: {
+                type: "category",
+                // boundaryGap: false,
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  // show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              series: [
+                {
+                  name: "气温",
+                  data: list.seriesData[i],
+                  type: "line",
+                  symbol: "circle",
+                  symbolSize: 5,
+                  itemStyle: {
+                    color: "#0783FA", // 符号的颜色
+                  },
+                  areaStyle: {
+                    //   opacity: 0.3,
+                    color: {
+                      type: "linear",
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [
+                        {
+                          offset: 0,
+                          color: "#0085FF", // 起始颜色
+                        },
+                        {
+                          offset: 1,
+                          color: "rgba(0,133,255,0)", // 结束颜色
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            });
+          }
+        } else {
+          if (i == 1) {
+            option.push({
+              tooltip: {
+                trigger: "axis",
+              },
+              grid: {
+                top: "10",
+                bottom: "40",
+              },
+              xAxis: {
+                type: "category",
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              series: [
+                {
+                  name: "风力",
+                  data: list.seriesData[i],
+                  type: "bar",
+                  barWidth: 15,
+                  color: {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: "#0085FF", // 起始颜色
+                      },
+                      {
+                        offset: 1,
+                        color: "#51E0FF", // 结束颜色
+                      },
+                    ],
+                  },
+                },
+              ],
+            });
+          } else {
+            option.push({
+              tooltip: {
+                trigger: "axis",
+              },
+              grid: {
+                top: "10",
+                bottom: "40",
+              },
+              xAxis: {
+                type: "category",
+                data: list.dateTime,
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              yAxis: {
+                type: "value",
+                splitLine: {
+                  lineStyle: {
+                    type: "dashed",
+                    color: "#A9B1BC",
+                    opacity: 0.2,
+                  },
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: "white",
+                  },
+                },
+              },
+              series: [
+                {
+                  data: list.seriesData[i],
+                  type: "bar",
+                  barWidth: 15,
+                  tooltip: {
+                    show: false,
+                  },
+                  color: {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: "rgba(0,85,255,0)", // 起始颜色
+                      },
+                      {
+                        offset: 1,
+                        color: "#0783FA", // 结束颜色
+                      },
+                    ],
+                  },
+                },
+                {
+                  name: "水位",
+                  color: "#15b1ff",
+                  type: "pictorialBar",
+                  symbol: "rect",
+                  symbolSize: ["15", "4"],
+                  symbolPosition: "end", // 图形边缘与柱子结束的地方内切。
+                  symbolOffset: [0, -2], // 椭圆水平偏移,垂直偏移. 因为不一定正好盖住柱形,所以可能要移动一点点
+                  data: list.seriesData[i],
+                  z: 3, // 数值越大,层级越高,可以盖住下面的图形
+                },
+              ],
+            });
+          }
+        }
+      }
+      bool ? (this.option = option) : (this.historyOption = option);
     },
     ondropdownClick({ key }) {
       this.dropdown = key;
@@ -1194,6 +1220,19 @@ export default {
         startTime: moment(this.dateRange[0]).format("YYYY-MM-DD HH:mm:ss"),
         endTime: moment(this.dateRange[1]).format("YYYY-MM-DD HH:mm:ss"),
       });
+    },
+    //历史数据弹窗
+    showModal() {
+      this.visible = true;
+      //获取历史环境数据
+      this.statisticsDay({
+        startTime: moment().subtract(7, "days").format("YYYY-MM-DD HH:mm:ss"),
+        endTime: moment().format("YYYY-MM-DD HH:mm:ss"),
+      });
+    },
+    handleOk(e) {
+      console.log(e);
+      this.visible = false;
     },
   },
 };
@@ -1205,11 +1244,9 @@ export default {
   position: relative;
   .aside {
     background: #122848;
-    border: 1px solid #2596ff;
     opacity: 0.8;
-    width: 419px;
-    height: 95%;
-    padding: 25px 0px;
+    width: 360px;
+    height: 96%;
     top: 0;
     bottom: 0;
     margin: auto;
@@ -1219,16 +1256,20 @@ export default {
     .reality {
       display: flex;
       padding: 0;
+      margin: 0;
       justify-content: space-around;
       color: white;
-      font-size: 18px;
       li {
         text-align: center;
         list-style: none;
         color: #ffffff;
         font-size: 12px;
+        img {
+          vertical-align: initial;
+          width: 36px;
+        }
         .re-num {
-          font-size: 20px;
+          font-size: 18px;
           color: #2484e3;
           i {
             font-size: 11px;
@@ -1238,35 +1279,64 @@ export default {
       }
     }
   }
-
+  .history {
+    position: absolute;
+    cursor: pointer;
+    left: 385px;
+    top: 50px;
+    width: 58px;
+    height: 69px;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("~@/assets/weather/history.png");
+  }
   .right {
     .top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0 12px;
-      height: 28px;
-      line-height: 28px;
+      height: 32px;
+      line-height: 32px;
       color: white;
-      margin: 0 16px;
-      border: 1px solid #2596ff;
+      background: #081935;
+      border-radius: 4px 4px 4px 4px;
     }
     .statistics {
-      padding: 0px 16px 0 16px;
       color: white;
     }
     /deep/ .ant-input {
-      background: #2a497b;
-      border: 1px solid #2596ff;
+      background: #081935;
+      border: unset;
       color: white;
       .ant-calendar-picker-clear {
-        background: #2a497b;
+        background: #122848;
         color: #fff;
       }
     }
   }
 }
-
+/deep/ .ant-modal-content {
+  background: #0a1934;
+  color: #ffffff;
+  box-shadow: inset 0px 1px 16px 0px #1e68b0;
+  .ant-modal-header {
+    background: transparent;
+    font-family: YouSheBiaoTiHei-Regular, YouSheBiaoTiHei;
+    border-bottom: 1px solid #1e68b0;
+    .ant-modal-title {
+      color: #ffffff;
+      text-shadow: 0px 0px 9px #158eff;
+      font-size: 22px;
+    }
+  }
+  .modal-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
 .toggle_icon {
   position: absolute;
   top: 20px;
