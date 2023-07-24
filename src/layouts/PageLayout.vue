@@ -2,7 +2,8 @@
   <a-layout class="client_layout w-100 h-100">
     <div>
       <router-link to="/version1">第一版</router-link> |
-      <router-link to="/version2">第二版</router-link>
+      <router-link to="/version2">第二版</router-link> |
+      <router-link to="/version3">第三版</router-link>
     </div>
 
     <a-layout-content class="client_content">
