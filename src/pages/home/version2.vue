@@ -1243,7 +1243,7 @@ export default {
   height: 100%;
   position: relative;
   .aside {
-    background: #122848;
+    // background: #122848;
     opacity: 0.8;
     width: 360px;
     height: 96%;

@@ -39,6 +39,14 @@ export const constantRouterMap = [
           showHeader: true,
         },
       },
+      {
+        path: "/version4",
+        name: "version4",
+        component: () => import("@/pages/home/version4"),
+        meta: {
+          showHeader: true,
+        },
+      },
     ],
   },
 ];

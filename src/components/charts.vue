@@ -1,7 +1,6 @@
 <template>
   <div :style="style">
-    <p class="title">
-      <span></span>
+    <p class="title" v-if="title">
       {{ title }}
     </p>
     <div class="content">
@@ -9,6 +8,7 @@
       <v-chart
         v-if="option"
         :option="option"
+        :theme="theme"
         autoresize
         :style="special == 1 || special == 2 ? 'height: calc(100% - 55px)' : ''"
       />
@@ -41,6 +41,10 @@ export default {
       type: Number,
       default: 0,
     },
+    theme: {
+      type: String,
+      default: "",
+    },
     option: {
       type: Object,
       default: () => {},
@@ -70,31 +74,18 @@ export default {
   color: #fff;
   text-align: left;
   font-size: 22px;
+  font-family: YouSheBiaoTiHei-Regular, YouSheBiaoTiHei;
   text-shadow: 0px 0px 9px #158eff;
-  background: linear-gradient(
-    90deg,
-    #05294b 0%,
-    #021f3a 0%,
-    rgba(5, 41, 75, 0) 100%
-  );
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("~@/assets/weather/titbg.png");
   margin-bottom: 16px;
-  span {
-    display: inline-block;
-    width: 2px;
-    height: 16px;
-    background: #0783fa;
-    margin-right: 10px;
-  }
+  padding-left: 32px;
 }
 .content {
   // background-color: #fdf7f714;
   margin-bottom: 25px;
   height: calc(100% - 44px);
-}
-.special {
-  background: #2a497b;
-  width: 93% !important;
-  margin: auto;
-  margin-top: 10px;
 }
 </style>

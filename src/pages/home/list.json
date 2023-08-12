@@ -1,0 +1,171 @@
+{
+  "status": 0,
+  "message": "操作成功",
+  "data": [
+    {
+      "country": "United Kingdom",
+      "count": 260,
+      "score": "-37.31"
+    },
+    {
+      "country": "Chinese Mainland",
+      "count": 202,
+      "score": "-23.27"
+    },
+    {
+      "country": "United States of America",
+      "count": 161,
+      "score": "-37.27"
+    },
+    {
+      "country": "Spain",
+      "count": 107,
+      "score": "-4.67"
+    },
+    {
+      "country": "Canada",
+      "count": 100,
+      "score": "-16.00"
+    },
+    {
+      "country": "Mexico",
+      "count": 68,
+      "score": "-67.65"
+    },
+    {
+      "country": "Australia",
+      "count": 53,
+      "score": "-50.94"
+    },
+    {
+      "country": "Argentina",
+      "count": 51,
+      "score": "-15.69"
+    },
+    {
+      "country": "Hong Kong",
+      "count": 37,
+      "score": "-29.73"
+    },
+    {
+      "country": "Italy",
+      "count": 30,
+      "score": "-56.67"
+    },
+    {
+      "country": "France",
+      "count": 25,
+      "score": "-96.00"
+    },
+    {
+      "country": "Austria",
+      "count": 22,
+      "score": "-50.00"
+    },
+    {
+      "country": "India",
+      "count": 19,
+      "score": "-15.79"
+    },
+    {
+      "country": "Peru",
+      "count": 17,
+      "score": "-100.00"
+    },
+    {
+      "country": "Russia",
+      "count": 14,
+      "score": "-71.43"
+    },
+    {
+      "country": "Colombia",
+      "count": 10,
+      "score": "-40.00"
+    },
+    {
+      "country": "Sweden",
+      "count": 9,
+      "score": "-11.11"
+    },
+    {
+      "country": "Poland",
+      "count": 6,
+      "score": "-16.67"
+    },
+    {
+      "country": "Turkey",
+      "count": 5,
+      "score": "-60.00"
+    },
+    {
+      "country": "Germany",
+      "count": 4,
+      "score": "-50.00"
+    },
+    {
+      "country": "South Africa",
+      "count": 3,
+      "score": "-100.00"
+    },
+    {
+      "country": "Czech Republic",
+      "count": 3,
+      "score": "66.67"
+    },
+    {
+      "country": "Belgium",
+      "count": 2,
+      "score": "-100.00"
+    },
+    {
+      "country": "Hungary",
+      "count": 2,
+      "score": "-50.00"
+    },
+    {
+      "country": "Cyprus",
+      "count": 2,
+      "score": "100.00"
+    },
+    {
+      "country": "Bulgaria",
+      "count": 2,
+      "score": "50.00"
+    },
+    {
+      "country": "Malaysia",
+      "count": 2,
+      "score": "-100.00"
+    },
+    {
+      "country": "Jordan",
+      "count": 1,
+      "score": "0.00"
+    },
+    {
+      "country": "Singapore",
+      "count": 1,
+      "score": "0.00"
+    },
+    {
+      "country": "Japan",
+      "count": 1,
+      "score": "100.00"
+    },
+    {
+      "country": "Ecuador",
+      "count": 1,
+      "score": "0.00"
+    },
+    {
+      "country": "Lithuania",
+      "count": 1,
+      "score": "100.00"
+    },
+    {
+      "country": "United Arab Emirates",
+      "count": 1,
+      "score": "100.00"
+    }
+  ]
+}
