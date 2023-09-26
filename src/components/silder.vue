@@ -81,7 +81,7 @@ export default {
       const startDate = moment(this.startDate);
       const endDate = moment(this.endDate);
       const totalDays = endDate.diff(startDate, "days");
-      const mappedMonths = Math.floor((number * totalDays) / 100);
+      const mappedMonths = (number * totalDays) / 100;
       const mappedDate = startDate.clone().add(mappedMonths, "days");
       return mappedDate;
     },
@@ -95,9 +95,7 @@ export default {
       let currentDate = startDateObj;
       let index = 0;
       let totalMonths =
-        ((endDateObj.year() - startDateObj.year()) * 12 +
-          (endDateObj.month() - startDateObj.month())) /
-        this.intervalMonths;
+        endDateObj.diff(startDateObj, "months") / this.intervalMonths;
       while (currentDate <= endDateObj) {
         const year = currentDate.year();
         const month = currentDate.month() + 1;
@@ -106,7 +104,8 @@ export default {
         dateList[index] = formattedDate;
 
         currentDate.month(currentDate.month() + this.intervalMonths);
-        index += Math.round(100 / totalMonths);
+        let num = 100 / totalMonths;
+        index = (index + num).toFixed(2) * 1;
       }
 
       return dateList;
