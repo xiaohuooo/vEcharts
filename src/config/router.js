@@ -13,7 +13,7 @@ export const constantRouterMap = [
     path: "/",
     component: PageLayout,
     name: "PageLayout",
-    redirect: "/version1",
+    redirect: "/menu",
     children: [
       {
         path: "/version1",
